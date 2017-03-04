@@ -1,4 +1,4 @@
-== Describe steps which are necessary in order to run this project in Docker containers
+== Steps which are necessary in order to run this project in Docker containers
 
 === Checkout this project from github
 ```shell
@@ -11,7 +11,7 @@ $ cd predcomposer
 $ docker run -d --name mysql-predcomposer -e MYSQL_ROOT_PASSWORD=my-secret-pass mysql:8
 ```
 
-=== Start second temporal Docker container
+=== Start second temporal Docker container in which we only execute MySQL commands
 ```shell
 $ docker run -it --rm -v $(pwd):/home/mysql/predcomposer --link mysql-predcomposer:mysql mysql:8 sh -c 'exec mysql -h"$MYSQL_PORT_3306_TCP_ADDR" -P"$MYSQL_PORT_3306_TCP_PORT" -uroot -p"$MYSQL_ENV_MYSQL_ROOT_PASSWORD"'
 ```
@@ -25,4 +25,11 @@ mysql> create user 'predcomposer'@'%' identified by 'predcomposer';
 mysql> grant all privileges on predcomposer.* to 'predcomposer'@'%';
 mysql> source /home/mysql/predcomposer/docs/create.ddl;
 mysql> exit
+```
+
+
+== Start Docker container with WildFly application server
+```shell
+$ docker run -it -p 8080:8080 -p 9990:9990 --link mysql-predcomposer:mysql jboss/wildfly:9.0.2.Final /opt/jboss/wildfly/bin/standalone.sh -bmanagement 0.0.0.0
+$JBOSS_HOME/bin/standalone.sh
 ```
