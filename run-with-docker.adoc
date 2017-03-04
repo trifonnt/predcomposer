@@ -35,12 +35,11 @@ mysql> exit
 
 == Start Docker container with WildFly application server
 ```shell
-$ docker run -it --name my-jboss-server -p 8080:8080 -p 9990:9990 --link mysql-predcomposer:mysql jboss/wildfly:9.0.2.Final /opt/jboss/wildfly/bin/standalone.sh -bmanagement 0.0.0.0
+$ docker run -it --name my-jboss-server -v $(pwd):/home/wildfly -p 8080:8080 -p 9990:9990 --link mysql-predcomposer:mysql jboss/wildfly:9.0.2.Final /opt/jboss/wildfly/bin/standalone.sh -bmanagement 0.0.0.0
 ```
 
 === Start another temporal Docker container which connects to already running JBoss Server
 ```shell
-$ docker exec my-jboss-server /bin/sh
 $ docker exec -it my-jboss-server ./wildfly/bin/jboss-cli.sh
 ```
 
@@ -51,13 +50,13 @@ connect
 
 # "Deploy" the mysql connector as module
 # Replace <connector-jar-location> with the actual path on your machine, e.g. ~/Downloads/mysql-connector-java-5.1.38-bin.jar
-module add --name=com.mysql --resources=<connector-jar-location> --dependencies=javax.api,javax.transaction.api
+module add --name=com.mysql --resources=/home/wildfly/mysql-connector-java-5.1.41-bin.jar --dependencies=javax.api,javax.transaction.api
 
 # Register the driver
 /subsystem=datasources/jdbc-driver=mysql:add(driver-name=mysql,driver-module-name=com.mysql,driver-xa-datasource-class-name=com.mysql.jdbc.jdbc2.optional.MysqlXADataSource)
 
 # Create the Data Source
-data-source add --name=mysqlDS --driver-name=mysql --jndi-name=java:jboss/datasources/PredComposerMySQLDS --connection-url=jdbc:mysql://localhost:3306/predcomposer?useSSL=false --user-name=predcomposer --password=predcomposer --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true
+data-source add --name=mysqlDS --driver-name=mysql --jndi-name=java:jboss/datasources/PredComposerMySQLDS --connection-url=jdbc:mysql://mysql:3306/predcomposer?useSSL=false --user-name=predcomposer --password=predcomposer --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true
 
 # Exit the command line interface
 exit
