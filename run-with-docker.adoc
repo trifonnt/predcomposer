@@ -5,13 +5,18 @@
 $ git clone https://github.com/trifonnt/predcomposer.git
 $ cd predcomposer
 ```
+=== Download MySQL JDBC driver
+```shell
+$ curl -LO https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.41.tar.gz
+// TODO Extract .jar file ...
+```
 
 === Start Docker container with MySQL version 8
 ```shell
 $ docker run -d --name mysql-predcomposer -e MYSQL_ROOT_PASSWORD=my-secret-pass mysql:8
 ```
 
-=== Start second temporal Docker container in which we only execute MySQL commands
+=== Start temporal Docker container in which we will execute MySQL commands
 ```shell
 $ docker run -it --rm -v $(pwd):/home/mysql/predcomposer --link mysql-predcomposer:mysql mysql:8 sh -c 'exec mysql -h"$MYSQL_PORT_3306_TCP_ADDR" -P"$MYSQL_PORT_3306_TCP_PORT" -uroot -p"$MYSQL_ENV_MYSQL_ROOT_PASSWORD"'
 ```
@@ -33,7 +38,27 @@ mysql> exit
 $ docker run -it --name my-jboss-server -p 8080:8080 -p 9990:9990 --link mysql-predcomposer:mysql jboss/wildfly:9.0.2.Final /opt/jboss/wildfly/bin/standalone.sh -bmanagement 0.0.0.0
 ```
 
-=== Start another temporal Docker container which connect to already running JBoss Server
+=== Start another temporal Docker container which connects to already running JBoss Server
 ```shell
+$ docker exec my-jboss-server /bin/sh
 $ docker exec -it my-jboss-server ./wildfly/bin/jboss-cli.sh
 ```
+
+[source,bash]
+----
+# Connect to the server
+connect
+
+# "Deploy" the mysql connector as module
+# Replace <connector-jar-location> with the actual path on your machine, e.g. ~/Downloads/mysql-connector-java-5.1.38-bin.jar
+module add --name=com.mysql --resources=<connector-jar-location> --dependencies=javax.api,javax.transaction.api
+
+# Register the driver
+/subsystem=datasources/jdbc-driver=mysql:add(driver-name=mysql,driver-module-name=com.mysql,driver-xa-datasource-class-name=com.mysql.jdbc.jdbc2.optional.MysqlXADataSource)
+
+# Create the Data Source
+data-source add --name=mysqlDS --driver-name=mysql --jndi-name=java:jboss/datasources/PredComposerMySQLDS --connection-url=jdbc:mysql://localhost:3306/predcomposer?useSSL=false --user-name=predcomposer --password=predcomposer --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true
+
+# Exit the command line interface
+exit
+----
