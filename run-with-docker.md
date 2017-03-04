@@ -1,2 +1,6 @@
 = Describe step which are necessary in order to run this project in Docker containers
 
+== Start Docker container with MySQL version 8
+```shell
+$ docker run -d --name mysql-predcomposer -e MYSQL_ROOT_PASSWORD=my-secret-pass mysql:8
+```
