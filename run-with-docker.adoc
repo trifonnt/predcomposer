@@ -65,6 +65,10 @@ module add --name=com.mysql --resources=/home/wildfly/mysql-connector-java-5.1.4
 # Create the Data Source
 data-source add --name=mysqlDS --driver-name=mysql --jndi-name=java:jboss/datasources/PredComposerMySQLDS --connection-url=jdbc:mysql://mysql:3306/predcomposer?useSSL=false --user-name=predcomposer --password=predcomposer --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true
 
+# TEMP - until we find how to automatically deploy it in docker
+# Deploy
+deploy /opt/jboss/wildfly/standalone/deployments/predcomposer.war
+
 # Exit the command line interface
 exit
 ----
