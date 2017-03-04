@@ -1,3 +1,6 @@
+== Usefull articles
+ http://tools.jboss.org/blog/2015-03-02-getting-started-with-docker-and-wildfly.html[Docker and WildFly Part 1 - Deployment via Docker volumes]
+
 == Steps which are necessary in order to run this project in Docker containers
 
 === Checkout this project from github
