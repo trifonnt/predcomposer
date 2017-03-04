@@ -5,6 +5,13 @@
 $ git clone https://github.com/trifonnt/predcomposer.git
 $ cd predcomposer
 ```
+
+=== Start Docker container with Apache MAven and build project from source code
+```shell
+$ docker volume create --name maven-repo
+$ docker run -it --rm --name my-maven-project -v maven-repo:/root/.m2 -v "$PWD":/usr/src/mymaven -w /usr/src/mymaven maven:3.3.9-jdk-8-alpine mvn -Dmaven.test.skip=true clean install
+```
+
 === Download MySQL JDBC driver
 ```shell
 $ curl -LO https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.41.tar.gz
