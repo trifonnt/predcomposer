@@ -1,6 +1,28 @@
 == Describe steps which are necessary in order to run this project in Docker containers
 
+=== Checkout this project from github
+```shell
+$ git clone https://github.com/trifonnt/predcomposer.git
+$ cd predcomposer
+```
+
 === Start Docker container with MySQL version 8
 ```shell
 $ docker run -d --name mysql-predcomposer -e MYSQL_ROOT_PASSWORD=my-secret-pass mysql:8
+```
+
+=== Start second temporal Docker container
+```shell
+$ docker run -it --rm -v $(pwd):/home/mysql/predcomposer --link mysql-predcomposer:mysql mysql:8 sh -c 'exec mysql -h"$MYSQL_PORT_3306_TCP_ADDR" -P"$MYSQL_PORT_3306_TCP_PORT" -uroot -p"$MYSQL_ENV_MYSQL_ROOT_PASSWORD"'
+```
+
+==== Now as we are inside the Docker container and inside MySQL server we can create new MySQL database and user
+```shell
+mysql> create database predcomposer;
+mysql> show databases;
+
+mysql> create user 'predcomposer'@'%' identified by 'predcomposer';
+mysql> grant all privileges on predcomposer.* to 'predcomposer'@'%';
+mysql> source /home/mysql/predcomposer/docs/create.ddl;
+mysql> exit
 ```
