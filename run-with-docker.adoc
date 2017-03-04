@@ -42,7 +42,7 @@ mysql> exit
 
 == Start Docker container with WildFly application server
 ```shell
-$ docker run -it --name my-jboss-server -v $(pwd)/target/predcomposer.war:/opt/jboss/wildfly/standalone/deployments/predcomposer.war -v $(pwd):/home/wildfly -p 8080:8080 -p 9990:9990 --link mysql-predcomposer:mysql jboss/wildfly:9.0.2.Final /opt/jboss/wildfly/bin/standalone.sh -bmanagement 0.0.0.0
+$ docker run -it --name my-jboss-server -v $(pwd)/target/predcomposer.war:/opt/jboss/wildfly/standalone/deployments/predcomposer.war:rw -v $(pwd):/home/wildfly -p 8080:8080 -p 9990:9990 --link mysql-predcomposer:mysql jboss/wildfly:9.0.2.Final /opt/jboss/wildfly/bin/standalone.sh -bmanagement 0.0.0.0
 ```
 
 === Start another temporal Docker container which connects to already running JBoss Server
